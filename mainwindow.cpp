@@ -90,8 +90,11 @@ void MainWindow::about()
 //! [11] //! [12]
 {
     QMessageBox::about(this, tr("About ALBERT"),
-            tr("<p><b>ALBERT</b> (Advanced Lightweight Bitmap Extender with Raster Tech) "
-               "is a pixel art editor for creating extended Commodore 64 images.</p>"));
+            tr("<p><b>ALBERT CE</b> %1 (Advanced Lightweight Bitmap Extender with Raster Tech) "
+               "is a pixel art editor for creating extended Commodore 64 images.</p>"
+               "<p>Source code: <a href=\"https://github.com/luigidifraia/ALBERT-Qt\">"
+               "github.com/luigidifraia/ALBERT-Qt</a></p>")
+                .arg(QApplication::applicationVersion()));
 }
 //! [12]
 
