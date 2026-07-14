@@ -2,7 +2,10 @@
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 cmake_minimum_required(VERSION 3.16)
-project(albert LANGUAGES CXX)
+# The single source of the application version: everything else (the About
+# dialog via the ALBERT_VERSION define, QApplication::applicationVersion,
+# the macOS bundle metadata) derives from it.
+project(albert VERSION 0.1.0 LANGUAGES CXX)
 
 find_package(Qt6
     REQUIRED COMPONENTS Core Gui Widgets
@@ -20,7 +23,13 @@ qt_add_executable(albert
 set_target_properties(albert PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 )
+
+# The application version, shown in the About dialog and set on the
+# QApplication (main.cpp).
+target_compile_definitions(albert PRIVATE ALBERT_VERSION="${PROJECT_VERSION}")
 
 target_link_libraries(albert PRIVATE
     Qt6::Core
