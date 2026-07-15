@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -38,17 +38,12 @@ private:
 
     CanvasArea *canvasArea;
 
-    QMenu *saveAsMenu;
-    QMenu *fileMenu;
-    QMenu *optionMenu;
-    QMenu *helpMenu;
-
     QAction *openAct;
     QList<QAction *> saveAsActs;
     QAction *exitAct;
     QAction *penColorAct;
     QAction *penWidthAct;
-    QAction *printAct;
+    QAction *printAct = nullptr;
     QAction *clearScreenAct;
     QAction *aboutAct;
     QAction *aboutQtAct;

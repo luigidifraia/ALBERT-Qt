@@ -5,14 +5,19 @@
 #include "canvasarea.h"
 
 #include <QApplication>
+#include <QCloseEvent>
 #include <QColorDialog>
+#include <QDir>
 #include <QFileDialog>
 #include <QImageWriter>
 #include <QInputDialog>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QCloseEvent>
 #include <QSettings>
+
+#if defined(QT_PRINTSUPPORT_LIB)
+#include <QtPrintSupport/qtprintsupportglobal.h>
+#endif
 
 //! [0]
 MainWindow::MainWindow(QWidget *parent)
@@ -49,8 +54,11 @@ void MainWindow::open()
     if (maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this,
                                    tr("Open File"), QDir::currentPath());
-        if (!fileName.isEmpty())
-            canvasArea->openImage(fileName);
+        if (!fileName.isEmpty() && !canvasArea->openImage(fileName)) {
+            QMessageBox::warning(this, tr("ALBERT"),
+                                 tr("Cannot open file %1.")
+                                 .arg(QDir::toNativeSeparators(fileName)));
+        }
     }
 }
 //! [4]
@@ -60,6 +68,8 @@ void MainWindow::save()
 //! [5] //! [6]
 {
     QAction *action = qobject_cast<QAction *>(sender());
+    if (!action)
+        return;
     QByteArray fileFormat = action->data().toByteArray();
     saveFile(fileFormat);
 }
@@ -69,7 +79,7 @@ void MainWindow::save()
 void MainWindow::penColor()
 //! [7] //! [8]
 {
-    QColor newColor = QColorDialog::getColor(canvasArea->penColor());
+    QColor newColor = QColorDialog::getColor(canvasArea->penColor(), this);
     if (newColor.isValid())
         canvasArea->setPenColor(newColor);
 }
@@ -120,8 +130,10 @@ void MainWindow::createActions()
         saveAsActs.append(action);
     }
 
+#if defined(QT_PRINTSUPPORT_LIB) && QT_CONFIG(printdialog)
     printAct = new QAction(tr("&Print..."), this);
     connect(printAct, &QAction::triggered, canvasArea, &CanvasArea::print);
+#endif
 
     exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
@@ -150,24 +162,26 @@ void MainWindow::createActions()
 void MainWindow::createMenus()
 //! [15] //! [16]
 {
-    saveAsMenu = new QMenu(tr("&Save As"), this);
+    QMenu *saveAsMenu = new QMenu(tr("&Save As"), this);
     for (QAction *action : std::as_const(saveAsActs))
         saveAsMenu->addAction(action);
 
-    fileMenu = new QMenu(tr("&File"), this);
+    QMenu *fileMenu = new QMenu(tr("&File"), this);
     fileMenu->addAction(openAct);
     fileMenu->addMenu(saveAsMenu);
+#if defined(QT_PRINTSUPPORT_LIB) && QT_CONFIG(printdialog)
     fileMenu->addAction(printAct);
+#endif
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
-    optionMenu = new QMenu(tr("&Options"), this);
+    QMenu *optionMenu = new QMenu(tr("&Options"), this);
     optionMenu->addAction(penColorAct);
     optionMenu->addAction(penWidthAct);
     optionMenu->addSeparator();
     optionMenu->addAction(clearScreenAct);
 
-    helpMenu = new QMenu(tr("&Help"), this);
+    QMenu *helpMenu = new QMenu(tr("&Help"), this);
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutQtAct);
 
@@ -226,6 +240,12 @@ bool MainWindow::saveFile(const QByteArray &fileFormat)
                                .arg(QString::fromLatin1(fileFormat)));
     if (fileName.isEmpty())
         return false;
-    return canvasArea->saveImage(fileName, fileFormat.constData());
+    if (canvasArea->saveImage(fileName, fileFormat.constData()))
+        return true;
+
+    QMessageBox::warning(this, tr("ALBERT"),
+                         tr("Cannot write file %1.")
+                         .arg(QDir::toNativeSeparators(fileName)));
+    return false;
 }
 //! [20]
