@@ -12,6 +12,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QSettings>
 
 //! [0]
 MainWindow::MainWindow(QWidget *parent)
@@ -23,7 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
 
     setWindowTitle(tr("ALBERT"));
-    resize(500, 500);
+    resize(500, 500); // the default; readSettings() may restore a saved geometry
+    readSettings();
 }
 //! [0]
 
@@ -31,10 +33,12 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::closeEvent(QCloseEvent *event)
 //! [1] //! [2]
 {
-    if (maybeSave())
+    if (maybeSave()) {
+        writeSettings();
         event->accept();
-    else
+    } else {
         event->ignore();
+    }
 }
 //! [2]
 
@@ -172,6 +176,22 @@ void MainWindow::createMenus()
     menuBar()->addMenu(helpMenu);
 }
 //! [16]
+
+void MainWindow::readSettings()
+{
+    QSettings settings;
+
+    const QByteArray geometry = settings.value("window/geometry").toByteArray();
+    if (!geometry.isEmpty())
+        restoreGeometry(geometry);
+}
+
+void MainWindow::writeSettings() const
+{
+    QSettings settings;
+
+    settings.setValue("window/geometry", saveGeometry());
+}
 
 //! [17]
 bool MainWindow::maybeSave()
