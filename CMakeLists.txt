@@ -31,6 +31,15 @@ set_target_properties(albert PROPERTIES
 # QApplication (main.cpp).
 target_compile_definitions(albert PRIVATE ALBERT_VERSION="${PROJECT_VERSION}")
 
+# Warnings, not errors: a clean build under one compiler says nothing about
+# the next one, and a build that fails on someone else's toolchain is how
+# these get removed again.
+if (MSVC)
+    target_compile_options(albert PRIVATE /W4)
+else()
+    target_compile_options(albert PRIVATE -Wall -Wextra -Wshadow)
+endif()
+
 target_link_libraries(albert PRIVATE
     Qt6::Core
     Qt6::Gui
