@@ -5,13 +5,14 @@
 #include "canvasarea.h"
 
 #include <QApplication>
+#include <QCloseEvent>
 #include <QColorDialog>
+#include <QDir>
 #include <QFileDialog>
 #include <QImageWriter>
 #include <QInputDialog>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QCloseEvent>
 #include <QSettings>
 
 //! [0]

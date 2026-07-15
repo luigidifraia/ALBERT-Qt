@@ -15,7 +15,7 @@ class CanvasArea : public QWidget
     Q_OBJECT
 
 public:
-    CanvasArea(QWidget *parent = nullptr);
+    explicit CanvasArea(QWidget *parent = nullptr);
 
     bool openImage(const QString &fileName);
     bool saveImage(const QString &fileName, const char *fileFormat);
