@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 # The single source of the application version: everything else (the About
 # dialog via the ALBERT_VERSION define, QApplication::applicationVersion,
 # the macOS bundle metadata) derives from it.
-project(albert VERSION 0.2.0 LANGUAGES CXX)
+project(albert VERSION 0.2.1 LANGUAGES CXX)
 
 find_package(Qt6
     REQUIRED COMPONENTS Core Gui Widgets
