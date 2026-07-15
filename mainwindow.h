@@ -32,6 +32,9 @@ private:
     void createMenus();
     bool maybeSave();
     bool saveFile(const QByteArray &fileFormat);
+    // Global application preferences. Read at startup, written on close.
+    void readSettings();
+    void writeSettings() const;
 
     CanvasArea *canvasArea;
 
