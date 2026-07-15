@@ -53,8 +53,8 @@ bool CanvasArea::openImage(const QString &fileName)
 
     QSize newSize = loadedImage.size().expandedTo(size());
     resizeImage(&loadedImage, newSize);
-    image = loadedImage;
-    modified = false;
+    m_image = loadedImage;
+    m_modified = false;
     update();
     return true;
 }
@@ -64,11 +64,11 @@ bool CanvasArea::openImage(const QString &fileName)
 bool CanvasArea::saveImage(const QString &fileName, const char *fileFormat)
 //! [3] //! [4]
 {
-    QImage visibleImage = image;
+    QImage visibleImage = m_image;
     resizeImage(&visibleImage, size());
 
     if (visibleImage.save(fileName, fileFormat)) {
-        modified = false;
+        m_modified = false;
         return true;
     }
     return false;
@@ -79,7 +79,7 @@ bool CanvasArea::saveImage(const QString &fileName, const char *fileFormat)
 void CanvasArea::setPenColor(const QColor &newColor)
 //! [5] //! [6]
 {
-    myPenColor = newColor;
+    m_penColor = newColor;
 }
 //! [6]
 
@@ -87,7 +87,7 @@ void CanvasArea::setPenColor(const QColor &newColor)
 void CanvasArea::setPenWidth(int newWidth)
 //! [7] //! [8]
 {
-    myPenWidth = newWidth;
+    m_penWidth = newWidth;
 }
 //! [8]
 
@@ -95,8 +95,8 @@ void CanvasArea::setPenWidth(int newWidth)
 void CanvasArea::clearImage()
 //! [9] //! [10]
 {
-    image.fill(qRgb(255, 255, 255));
-    modified = true;
+    m_image.fill(qRgb(255, 255, 255));
+    m_modified = true;
     update();
 }
 //! [10]
@@ -106,22 +106,22 @@ void CanvasArea::mousePressEvent(QMouseEvent *event)
 //! [11] //! [12]
 {
     if (event->button() == Qt::LeftButton) {
-        lastPoint = event->position().toPoint();
-        drawing = true;
+        m_lastPoint = event->position().toPoint();
+        m_drawing = true;
     }
 }
 
 void CanvasArea::mouseMoveEvent(QMouseEvent *event)
 {
-    if ((event->buttons() & Qt::LeftButton) && drawing)
+    if ((event->buttons() & Qt::LeftButton) && m_drawing)
         drawLineTo(event->position().toPoint());
 }
 
 void CanvasArea::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton && drawing) {
+    if (event->button() == Qt::LeftButton && m_drawing) {
         drawLineTo(event->position().toPoint());
-        drawing = false;
+        m_drawing = false;
     }
 }
 
@@ -131,7 +131,7 @@ void CanvasArea::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     QRect dirtyRect = event->rect();
-    painter.drawImage(dirtyRect, image, dirtyRect);
+    painter.drawImage(dirtyRect, m_image, dirtyRect);
 }
 //! [14]
 
@@ -139,10 +139,10 @@ void CanvasArea::paintEvent(QPaintEvent *event)
 void CanvasArea::resizeEvent(QResizeEvent *event)
 //! [15] //! [16]
 {
-    if (width() > image.width() || height() > image.height()) {
-        int newWidth = (std::max)(width() + 128, image.width());
-        int newHeight = (std::max)(height() + 128, image.height());
-        resizeImage(&image, QSize(newWidth, newHeight));
+    if (width() > m_image.width() || height() > m_image.height()) {
+        int newWidth = (std::max)(width() + 128, m_image.width());
+        int newHeight = (std::max)(height() + 128, m_image.height());
+        resizeImage(&m_image, QSize(newWidth, newHeight));
         update();
     }
     QWidget::resizeEvent(event);
@@ -153,16 +153,16 @@ void CanvasArea::resizeEvent(QResizeEvent *event)
 void CanvasArea::drawLineTo(const QPoint &endPoint)
 //! [17] //! [18]
 {
-    QPainter painter(&image);
-    painter.setPen(QPen(myPenColor, myPenWidth, Qt::SolidLine, Qt::RoundCap,
+    QPainter painter(&m_image);
+    painter.setPen(QPen(m_penColor, m_penWidth, Qt::SolidLine, Qt::RoundCap,
                         Qt::RoundJoin));
-    painter.drawLine(lastPoint, endPoint);
-    modified = true;
+    painter.drawLine(m_lastPoint, endPoint);
+    m_modified = true;
 
-    int rad = (myPenWidth / 2) + 2;
-    update(QRect(lastPoint, endPoint).normalized()
-                                     .adjusted(-rad, -rad, +rad, +rad));
-    lastPoint = endPoint;
+    int rad = (m_penWidth / 2) + 2;
+    update(QRect(m_lastPoint, endPoint).normalized()
+                                       .adjusted(-rad, -rad, +rad, +rad));
+    m_lastPoint = endPoint;
 }
 //! [18]
 
@@ -177,11 +177,11 @@ void CanvasArea::print()
     if (printDialog.exec() == QDialog::Accepted) {
         QPainter painter(&printer);
         QRect rect = painter.viewport();
-        QSize size = image.size();
+        QSize size = m_image.size();
         size.scale(rect.size(), Qt::KeepAspectRatio);
         painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
-        painter.setWindow(image.rect());
-        painter.drawImage(0, 0, image);
+        painter.setWindow(m_image.rect());
+        painter.drawImage(0, 0, m_image);
     }
 #endif // QT_CONFIG(printdialog)
 }

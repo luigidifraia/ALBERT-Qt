@@ -21,9 +21,9 @@
 
 //! [0]
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), canvasArea(new CanvasArea(this))
+    : QMainWindow(parent), m_canvasArea(new CanvasArea(this))
 {
-    setCentralWidget(canvasArea);
+    setCentralWidget(m_canvasArea);
 
     createActions();
     createMenus();
@@ -54,7 +54,7 @@ void MainWindow::open()
     if (maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this,
                                    tr("Open File"), QDir::currentPath());
-        if (!fileName.isEmpty() && !canvasArea->openImage(fileName)) {
+        if (!fileName.isEmpty() && !m_canvasArea->openImage(fileName)) {
             QMessageBox::warning(this, tr("ALBERT"),
                                  tr("Cannot open file %1.")
                                  .arg(QDir::toNativeSeparators(fileName)));
@@ -79,9 +79,9 @@ void MainWindow::save()
 void MainWindow::penColor()
 //! [7] //! [8]
 {
-    QColor newColor = QColorDialog::getColor(canvasArea->penColor(), this);
+    QColor newColor = QColorDialog::getColor(m_canvasArea->penColor(), this);
     if (newColor.isValid())
-        canvasArea->setPenColor(newColor);
+        m_canvasArea->setPenColor(newColor);
 }
 //! [8]
 
@@ -92,10 +92,10 @@ void MainWindow::penWidth()
     bool ok;
     int newWidth = QInputDialog::getInt(this, tr("ALBERT"),
                                         tr("Select pen width:"),
-                                        canvasArea->penWidth(),
+                                        m_canvasArea->penWidth(),
                                         1, 50, 1, &ok);
     if (ok)
-        canvasArea->setPenWidth(newWidth);
+        m_canvasArea->setPenWidth(newWidth);
 }
 //! [10]
 
@@ -116,9 +116,9 @@ void MainWindow::about()
 void MainWindow::createActions()
 //! [13] //! [14]
 {
-    openAct = new QAction(tr("&Open..."), this);
-    openAct->setShortcuts(QKeySequence::Open);
-    connect(openAct, &QAction::triggered, this, &MainWindow::open);
+    m_openAct = new QAction(tr("&Open..."), this);
+    m_openAct->setShortcuts(QKeySequence::Open);
+    connect(m_openAct, &QAction::triggered, this, &MainWindow::open);
 
     const QList<QByteArray> imageFormats = QImageWriter::supportedImageFormats();
     for (const QByteArray &format : imageFormats) {
@@ -127,34 +127,34 @@ void MainWindow::createActions()
         QAction *action = new QAction(text, this);
         action->setData(format);
         connect(action, &QAction::triggered, this, &MainWindow::save);
-        saveAsActs.append(action);
+        m_saveAsActs.append(action);
     }
 
 #if defined(QT_PRINTSUPPORT_LIB) && QT_CONFIG(printdialog)
-    printAct = new QAction(tr("&Print..."), this);
-    connect(printAct, &QAction::triggered, canvasArea, &CanvasArea::print);
+    m_printAct = new QAction(tr("&Print..."), this);
+    connect(m_printAct, &QAction::triggered, m_canvasArea, &CanvasArea::print);
 #endif
 
-    exitAct = new QAction(tr("E&xit"), this);
-    exitAct->setShortcuts(QKeySequence::Quit);
-    connect(exitAct, &QAction::triggered, this, &MainWindow::close);
+    m_exitAct = new QAction(tr("E&xit"), this);
+    m_exitAct->setShortcuts(QKeySequence::Quit);
+    connect(m_exitAct, &QAction::triggered, this, &MainWindow::close);
 
-    penColorAct = new QAction(tr("&Pen Color..."), this);
-    connect(penColorAct, &QAction::triggered, this, &MainWindow::penColor);
+    m_penColorAct = new QAction(tr("&Pen Color..."), this);
+    connect(m_penColorAct, &QAction::triggered, this, &MainWindow::penColor);
 
-    penWidthAct = new QAction(tr("Pen &Width..."), this);
-    connect(penWidthAct, &QAction::triggered, this, &MainWindow::penWidth);
+    m_penWidthAct = new QAction(tr("Pen &Width..."), this);
+    connect(m_penWidthAct, &QAction::triggered, this, &MainWindow::penWidth);
 
-    clearScreenAct = new QAction(tr("&Clear Screen"), this);
-    clearScreenAct->setShortcut(tr("Ctrl+L"));
-    connect(clearScreenAct, &QAction::triggered,
-            canvasArea, &CanvasArea::clearImage);
+    m_clearScreenAct = new QAction(tr("&Clear Screen"), this);
+    m_clearScreenAct->setShortcut(tr("Ctrl+L"));
+    connect(m_clearScreenAct, &QAction::triggered,
+            m_canvasArea, &CanvasArea::clearImage);
 
-    aboutAct = new QAction(tr("&About"), this);
-    connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
+    m_aboutAct = new QAction(tr("&About"), this);
+    connect(m_aboutAct, &QAction::triggered, this, &MainWindow::about);
 
-    aboutQtAct = new QAction(tr("About &Qt"), this);
-    connect(aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
+    m_aboutQtAct = new QAction(tr("About &Qt"), this);
+    connect(m_aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
 }
 //! [14]
 
@@ -163,27 +163,27 @@ void MainWindow::createMenus()
 //! [15] //! [16]
 {
     QMenu *saveAsMenu = new QMenu(tr("&Save As"), this);
-    for (QAction *action : std::as_const(saveAsActs))
+    for (QAction *action : std::as_const(m_saveAsActs))
         saveAsMenu->addAction(action);
 
     QMenu *fileMenu = new QMenu(tr("&File"), this);
-    fileMenu->addAction(openAct);
+    fileMenu->addAction(m_openAct);
     fileMenu->addMenu(saveAsMenu);
 #if defined(QT_PRINTSUPPORT_LIB) && QT_CONFIG(printdialog)
-    fileMenu->addAction(printAct);
+    fileMenu->addAction(m_printAct);
 #endif
     fileMenu->addSeparator();
-    fileMenu->addAction(exitAct);
+    fileMenu->addAction(m_exitAct);
 
     QMenu *optionMenu = new QMenu(tr("&Options"), this);
-    optionMenu->addAction(penColorAct);
-    optionMenu->addAction(penWidthAct);
+    optionMenu->addAction(m_penColorAct);
+    optionMenu->addAction(m_penWidthAct);
     optionMenu->addSeparator();
-    optionMenu->addAction(clearScreenAct);
+    optionMenu->addAction(m_clearScreenAct);
 
     QMenu *helpMenu = new QMenu(tr("&Help"), this);
-    helpMenu->addAction(aboutAct);
-    helpMenu->addAction(aboutQtAct);
+    helpMenu->addAction(m_aboutAct);
+    helpMenu->addAction(m_aboutQtAct);
 
     menuBar()->addMenu(fileMenu);
     menuBar()->addMenu(optionMenu);
@@ -211,7 +211,7 @@ void MainWindow::writeSettings() const
 bool MainWindow::maybeSave()
 //! [17] //! [18]
 {
-    if (canvasArea->isModified()) {
+    if (m_canvasArea->isModified()) {
        QMessageBox::StandardButton ret;
        ret = QMessageBox::warning(this, tr("ALBERT"),
                           tr("The image has been modified.\n"
@@ -240,7 +240,7 @@ bool MainWindow::saveFile(const QByteArray &fileFormat)
                                .arg(QString::fromLatin1(fileFormat)));
     if (fileName.isEmpty())
         return false;
-    if (canvasArea->saveImage(fileName, fileFormat.constData()))
+    if (m_canvasArea->saveImage(fileName, fileFormat.constData()))
         return true;
 
     QMessageBox::warning(this, tr("ALBERT"),
