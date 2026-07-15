@@ -22,9 +22,9 @@ public:
     void setPenColor(const QColor &newColor);
     void setPenWidth(int newWidth);
 
-    bool isModified() const { return modified; }
-    QColor penColor() const { return myPenColor; }
-    int penWidth() const { return myPenWidth; }
+    bool isModified() const { return m_modified; }
+    QColor penColor() const { return m_penColor; }
+    int penWidth() const { return m_penWidth; }
 
 public slots:
     void clearImage();
@@ -40,12 +40,12 @@ protected:
 private:
     void drawLineTo(const QPoint &endPoint);
 
-    bool modified = false;
-    bool drawing = false;
-    int myPenWidth = 1;
-    QColor myPenColor = Qt::blue;
-    QImage image;
-    QPoint lastPoint;
+    bool m_modified = false;
+    bool m_drawing = false;
+    int m_penWidth = 1;
+    QColor m_penColor = Qt::blue;
+    QImage m_image;
+    QPoint m_lastPoint;
 };
 //! [0]
 

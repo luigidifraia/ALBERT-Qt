@@ -36,17 +36,17 @@ private:
     void readSettings();
     void writeSettings() const;
 
-    CanvasArea *canvasArea;
+    CanvasArea *m_canvasArea;
 
-    QAction *openAct;
-    QList<QAction *> saveAsActs;
-    QAction *exitAct;
-    QAction *penColorAct;
-    QAction *penWidthAct;
-    QAction *printAct = nullptr;
-    QAction *clearScreenAct;
-    QAction *aboutAct;
-    QAction *aboutQtAct;
+    QAction *m_openAct;
+    QList<QAction *> m_saveAsActs;
+    QAction *m_exitAct;
+    QAction *m_penColorAct;
+    QAction *m_penWidthAct;
+    QAction *m_printAct = nullptr;
+    QAction *m_clearScreenAct;
+    QAction *m_aboutAct;
+    QAction *m_aboutQtAct;
 };
 //! [0]
 
