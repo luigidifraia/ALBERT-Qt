@@ -50,8 +50,11 @@ void MainWindow::open()
     if (maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this,
                                    tr("Open File"), QDir::currentPath());
-        if (!fileName.isEmpty())
-            canvasArea->openImage(fileName);
+        if (!fileName.isEmpty() && !canvasArea->openImage(fileName)) {
+            QMessageBox::warning(this, tr("ALBERT"),
+                                 tr("Cannot open file %1.")
+                                 .arg(QDir::toNativeSeparators(fileName)));
+        }
     }
 }
 //! [4]
@@ -61,6 +64,8 @@ void MainWindow::save()
 //! [5] //! [6]
 {
     QAction *action = qobject_cast<QAction *>(sender());
+    if (!action)
+        return;
     QByteArray fileFormat = action->data().toByteArray();
     saveFile(fileFormat);
 }
@@ -227,6 +232,12 @@ bool MainWindow::saveFile(const QByteArray &fileFormat)
                                .arg(QString::fromLatin1(fileFormat)));
     if (fileName.isEmpty())
         return false;
-    return canvasArea->saveImage(fileName, fileFormat.constData());
+    if (canvasArea->saveImage(fileName, fileFormat.constData()))
+        return true;
+
+    QMessageBox::warning(this, tr("ALBERT"),
+                         tr("Cannot write file %1.")
+                         .arg(QDir::toNativeSeparators(fileName)));
+    return false;
 }
 //! [20]
