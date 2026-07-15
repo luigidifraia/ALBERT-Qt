@@ -162,11 +162,11 @@ void MainWindow::createActions()
 void MainWindow::createMenus()
 //! [15] //! [16]
 {
-    saveAsMenu = new QMenu(tr("&Save As"), this);
+    QMenu *saveAsMenu = new QMenu(tr("&Save As"), this);
     for (QAction *action : std::as_const(saveAsActs))
         saveAsMenu->addAction(action);
 
-    fileMenu = new QMenu(tr("&File"), this);
+    QMenu *fileMenu = new QMenu(tr("&File"), this);
     fileMenu->addAction(openAct);
     fileMenu->addMenu(saveAsMenu);
 #if defined(QT_PRINTSUPPORT_LIB) && QT_CONFIG(printdialog)
@@ -175,13 +175,13 @@ void MainWindow::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
-    optionMenu = new QMenu(tr("&Options"), this);
+    QMenu *optionMenu = new QMenu(tr("&Options"), this);
     optionMenu->addAction(penColorAct);
     optionMenu->addAction(penWidthAct);
     optionMenu->addSeparator();
     optionMenu->addAction(clearScreenAct);
 
-    helpMenu = new QMenu(tr("&Help"), this);
+    QMenu *helpMenu = new QMenu(tr("&Help"), this);
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutQtAct);
 

@@ -38,11 +38,6 @@ private:
 
     CanvasArea *canvasArea;
 
-    QMenu *saveAsMenu;
-    QMenu *fileMenu;
-    QMenu *optionMenu;
-    QMenu *helpMenu;
-
     QAction *openAct;
     QList<QAction *> saveAsActs;
     QAction *exitAct;

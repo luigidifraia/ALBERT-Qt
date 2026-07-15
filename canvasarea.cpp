@@ -16,6 +16,25 @@
 
 #include <algorithm>
 
+namespace {
+
+//! [19]
+void resizeImage(QImage *image, const QSize &newSize)
+//! [19] //! [20]
+{
+    if (image->size() == newSize)
+        return;
+
+    QImage newImage(newSize, QImage::Format_RGB32);
+    newImage.fill(qRgb(255, 255, 255));
+    QPainter painter(&newImage);
+    painter.drawImage(QPoint(0, 0), *image);
+    *image = newImage;
+}
+//! [20]
+
+} // namespace
+
 //! [0]
 CanvasArea::CanvasArea(QWidget *parent)
     : QWidget(parent)
@@ -146,21 +165,6 @@ void CanvasArea::drawLineTo(const QPoint &endPoint)
     lastPoint = endPoint;
 }
 //! [18]
-
-//! [19]
-void CanvasArea::resizeImage(QImage *image, const QSize &newSize)
-//! [19] //! [20]
-{
-    if (image->size() == newSize)
-        return;
-
-    QImage newImage(newSize, QImage::Format_RGB32);
-    newImage.fill(qRgb(255, 255, 255));
-    QPainter painter(&newImage);
-    painter.drawImage(QPoint(0, 0), *image);
-    *image = newImage;
-}
-//! [20]
 
 //! [21]
 void CanvasArea::print()

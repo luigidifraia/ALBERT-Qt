@@ -39,7 +39,6 @@ protected:
 
 private:
     void drawLineTo(const QPoint &endPoint);
-    void resizeImage(QImage *image, const QSize &newSize);
 
     bool modified = false;
     bool drawing = false;
