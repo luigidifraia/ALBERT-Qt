@@ -48,7 +48,7 @@ private:
     QAction *exitAct;
     QAction *penColorAct;
     QAction *penWidthAct;
-    QAction *printAct;
+    QAction *printAct = nullptr;
     QAction *clearScreenAct;
     QAction *aboutAct;
     QAction *aboutQtAct;

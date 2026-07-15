@@ -15,6 +15,10 @@
 #include <QMessageBox>
 #include <QSettings>
 
+#if defined(QT_PRINTSUPPORT_LIB)
+#include <QtPrintSupport/qtprintsupportglobal.h>
+#endif
+
 //! [0]
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), canvasArea(new CanvasArea(this))
@@ -75,7 +79,7 @@ void MainWindow::save()
 void MainWindow::penColor()
 //! [7] //! [8]
 {
-    QColor newColor = QColorDialog::getColor(canvasArea->penColor());
+    QColor newColor = QColorDialog::getColor(canvasArea->penColor(), this);
     if (newColor.isValid())
         canvasArea->setPenColor(newColor);
 }
@@ -126,8 +130,10 @@ void MainWindow::createActions()
         saveAsActs.append(action);
     }
 
+#if defined(QT_PRINTSUPPORT_LIB) && QT_CONFIG(printdialog)
     printAct = new QAction(tr("&Print..."), this);
     connect(printAct, &QAction::triggered, canvasArea, &CanvasArea::print);
+#endif
 
     exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
@@ -163,7 +169,9 @@ void MainWindow::createMenus()
     fileMenu = new QMenu(tr("&File"), this);
     fileMenu->addAction(openAct);
     fileMenu->addMenu(saveAsMenu);
+#if defined(QT_PRINTSUPPORT_LIB) && QT_CONFIG(printdialog)
     fileMenu->addAction(printAct);
+#endif
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
